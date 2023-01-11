@@ -15,7 +15,7 @@ class NoteBooksPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Notesketch - ???"),
+        title: const Text("Notesketch"),
       ),
       drawer: Consumer(builder: (context, ref, child) {
         final noteBooksPageState =
@@ -37,6 +37,51 @@ class NoteBooksPage extends StatelessWidget {
           ),
         );
       }),
+      body: Consumer(
+        builder: (context, ref, child) {
+          final noteBooksPageState = ref.watch(noteBooksPageStateProvider);
+          if (noteBooksPageState.openingNotePageId != null) {
+            final openingNotePage = ref
+                .watch(notePagesProvider.notifier)
+                .getNotePage(noteBooksPageState.openingNotePageId!)!;
+            return Column(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.description),
+                        Text(openingNotePage.title),
+                      ],
+                    ),
+                    Text(
+                        "updated : ${formatDateTime(openingNotePage.updatedAt)}"),
+                    Text(
+                        "created : ${formatDateTime(openingNotePage.createdAt)}"),
+                    Row(),
+                  ],
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: ref
+                        .watch(noteBooksPageStateProvider.notifier)
+                        .textEditingController,
+                    maxLines: null,
+                    expands: true,
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [Center(child: Text("Please open any page."))],
+            );
+          }
+        },
+      ),
     );
   }
 
@@ -416,7 +461,13 @@ class NoteBooksPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pop(context);
+                      ref
+                          .read(noteBooksPageStateProvider.notifier)
+                          .openNotePage(notePage.id, notePage.content);
+                    },
+                    selected: notePageState.openingNotePageId == notePage.id,
                   );
                 }).toList(),
               ),
@@ -568,7 +619,7 @@ class NoteBooksPage extends StatelessWidget {
                 child: const Text("continue"),
                 onPressed: () {
                   Navigator.pop(context);
-                  ref.read(noteBooksProvider.notifier).deleteNoteBook(id);
+                  ref.read(notePagesProvider.notifier).deleteNotePage(id);
                 },
               ),
             ],

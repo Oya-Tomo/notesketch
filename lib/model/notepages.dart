@@ -94,6 +94,15 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
   NotePagesStateNotifier() : super([]);
   final DataBase _database = DataBase();
 
+  NotePage? getNotePage(int id) {
+    for (final page in state) {
+      if (page.id == id) {
+        return page;
+      }
+    }
+    return null;
+  }
+
   void openNoteBook(int id) async {
     final rowPages = await (_database.select(_database.notePages)
           ..where((t) => t.noteBookId.equals(id)))
