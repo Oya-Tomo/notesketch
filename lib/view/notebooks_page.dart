@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notesketch/model/notebooks.dart';
 import 'package:notesketch/model/notepages.dart';
 import 'package:notesketch/view/color_themes.dart';
+import 'package:notesketch/view/components/batch.dart';
 import 'package:notesketch/view/components/gradient_button.dart';
 import 'package:notesketch/view/components/gradient_divider.dart';
 import 'package:notesketch/view/utils.dart';
@@ -37,51 +38,66 @@ class NoteBooksPage extends StatelessWidget {
           ),
         );
       }),
-      body: Consumer(
-        builder: (context, ref, child) {
-          final noteBooksPageState = ref.watch(noteBooksPageStateProvider);
-          if (noteBooksPageState.openingNotePageId != null) {
-            final openingNotePage = ref
-                .watch(notePagesProvider.notifier)
-                .getNotePage(noteBooksPageState.openingNotePageId!)!;
-            return Column(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+      body: pageEditBody(),
+    );
+  }
+
+  Consumer pageEditBody() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final noteBooksPageState = ref.watch(noteBooksPageStateProvider);
+        if (noteBooksPageState.openingNotePageId != null) {
+          final openingNotePage = ref
+              .watch(notePagesProvider.notifier)
+              .getNotePage(noteBooksPageState.openingNotePageId!)!;
+          return Column(
+            children: [
+              Container(
+                padding: EdgeInsets.all(15),
+                decoration: const BoxDecoration(
+                  color: Color.fromRGBO(0, 0, 0, 0.451),
+                ),
+                child: Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.description),
-                        Text(openingNotePage.title),
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.description),
+                        ),
+                        Text(
+                          openingNotePage.title,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
                       ],
                     ),
-                    Text(
-                        "updated : ${formatDateTime(openingNotePage.updatedAt)}"),
-                    Text(
-                        "created : ${formatDateTime(openingNotePage.createdAt)}"),
-                    Row(),
+                    Row(
+                      children: openingNotePage.batches.map((batch) {
+                        return NotePageBatch(
+                            title: batch.title, color: batch.color);
+                      }).toList(),
+                    ),
                   ],
                 ),
-                Expanded(
-                  child: TextField(
-                    controller: ref
-                        .watch(noteBooksPageStateProvider.notifier)
-                        .textEditingController,
-                    maxLines: null,
-                    expands: true,
-                  ),
+              ),
+              Expanded(
+                child: TextField(
+                  controller: ref
+                      .watch(noteBooksPageStateProvider.notifier)
+                      .textEditingController,
+                  maxLines: null,
+                  expands: true,
                 ),
-              ],
-            );
-          } else {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [Center(child: Text("Please open any page."))],
-            );
-          }
-        },
-      ),
+              ),
+            ],
+          );
+        } else {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [Center(child: Text("Please open any page."))],
+          );
+        }
+      },
     );
   }
 
@@ -436,6 +452,7 @@ class NoteBooksPage extends StatelessWidget {
                     title: Text(notePage.title),
                     subtitle:
                         Text("updated : ${formatDateTime(notePage.updatedAt)}"),
+                    // TODO : add batch list
                     trailing: PopupMenuButton(
                       child: const Icon(Icons.more_horiz),
                       onSelected: (value) {

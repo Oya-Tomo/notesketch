@@ -66,7 +66,6 @@ class NoteBatches extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get index => integer()();
   TextColumn get title => text()();
-  TextColumn get content => text()();
   IntColumn get color => integer()();
 }
 
@@ -74,13 +73,11 @@ class NoteBatchRow {
   int id;
   int index;
   String title;
-  String content;
   int color;
   NoteBatchRow({
     required this.id,
     required this.index,
     required this.title,
-    required this.content,
     required this.color,
   });
 }

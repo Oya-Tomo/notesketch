@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notesketch/database/database.dart';
+import 'package:notesketch/model/notebatches.dart';
 
 @immutable
 class NotePage {
@@ -48,44 +49,6 @@ class NotePage {
       batches: batches ?? this.batches,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
-}
-
-@immutable
-class NoteBatch {
-  const NoteBatch({
-    required this.id,
-    required this.title,
-    required this.content,
-    required this.color,
-  });
-
-  factory NoteBatch.fromRow({required NoteBatchRow row}) {
-    return NoteBatch(
-      id: row.id,
-      title: row.title,
-      content: row.content,
-      color: row.color,
-    );
-  }
-
-  final int id;
-  final String title;
-  final String content;
-  final int color;
-
-  NoteBatch copyWith({
-    int? id,
-    String? title,
-    String? content,
-    int? color,
-  }) {
-    return NoteBatch(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      content: content ?? this.content,
-      color: color ?? this.color,
     );
   }
 }
@@ -228,6 +191,62 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
     }
   }
 
+  Future<void> addNotePageBatch(int id, int batchId) async {
+    await (_database.into(_database.notePageBatchEntries).insert(
+          NotePageBatchEntriesCompanion.insert(
+            notePageId: id,
+            noteBatchId: batchId,
+          ),
+        ));
+
+    final batch = await (_database.select(_database.noteBatches)
+          ..where((tbl) => tbl.id.equals(batchId)))
+        .getSingle();
+
+    state = [
+      for (final page in state)
+        if (page.id == id)
+          page.copyWith(
+            batches: [
+              ...page.batches,
+              NoteBatch.fromRow(row: batch),
+            ],
+          )
+        else
+          page,
+    ];
+  }
+
+  Future<void> deleteNotePageBatch(int id, int batchId) async {
+    await (_database.delete(_database.notePageBatchEntries)
+          ..where((tbl) =>
+              tbl.notePageId.equals(id) & tbl.noteBatchId.equals(batchId)))
+        .go();
+
+    state = [
+      for (final page in state)
+        if (page.id == id)
+          page.copyWith(
+            batches:
+                page.batches.where((batch) => batch.id != batchId).toList(),
+          )
+        else
+          page,
+    ];
+  }
+
+  Future<void> deleteAllNotePageBatches(int batchId) async {
+    // only delete batches in state
+    state = state
+        .map(
+          (page) => page.copyWith(
+            batches:
+                page.batches.where((batch) => batch.id != batchId).toList(),
+          ),
+        )
+        .toList();
+  }
+
   void _add(NotePage notePage) {
     state = [
       ...state,
@@ -251,25 +270,9 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
   }
 }
 
-class NoteBatchesStateNotifier extends StateNotifier<List<NoteBatch>> {
-  NoteBatchesStateNotifier() : super([]);
-  final DataBase _database = DataBase();
-  void fetchData() async {
-    final rows = await _database.select(_database.noteBatches).get();
-    state = rows.map((row) => NoteBatch.fromRow(row: row)).toList();
-  }
-}
-
 final notePagesProvider =
     StateNotifierProvider<NotePagesStateNotifier, List<NotePage>>(
   (ref) {
     return NotePagesStateNotifier();
-  },
-);
-
-final noteBatchesProvider =
-    StateNotifierProvider<NoteBatchesStateNotifier, List<NoteBatch>>(
-  (ref) {
-    return NoteBatchesStateNotifier();
   },
 );

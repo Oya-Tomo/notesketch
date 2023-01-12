@@ -469,19 +469,13 @@ class $NoteBatchesTable extends NoteBatches
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
       'title', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _contentMeta =
-      const VerificationMeta('content');
-  @override
-  late final GeneratedColumn<String> content = GeneratedColumn<String>(
-      'content', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _colorMeta = const VerificationMeta('color');
   @override
   late final GeneratedColumn<int> color = GeneratedColumn<int>(
       'color', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [id, index, title, content, color];
+  List<GeneratedColumn> get $columns => [id, index, title, color];
   @override
   String get aliasedName => _alias ?? 'note_batches';
   @override
@@ -506,12 +500,6 @@ class $NoteBatchesTable extends NoteBatches
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
-    if (data.containsKey('content')) {
-      context.handle(_contentMeta,
-          content.isAcceptableOrUnknown(data['content']!, _contentMeta));
-    } else if (isInserting) {
-      context.missing(_contentMeta);
-    }
     if (data.containsKey('color')) {
       context.handle(
           _colorMeta, color.isAcceptableOrUnknown(data['color']!, _colorMeta));
@@ -533,8 +521,6 @@ class $NoteBatchesTable extends NoteBatches
           .read(DriftSqlType.int, data['${effectivePrefix}index'])!,
       title: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
-      content: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}content'])!,
       color: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}color'])!,
     );
@@ -550,37 +536,31 @@ class NoteBatchesCompanion extends UpdateCompanion<NoteBatchRow> {
   final Value<int> id;
   final Value<int> index;
   final Value<String> title;
-  final Value<String> content;
   final Value<int> color;
   const NoteBatchesCompanion({
     this.id = const Value.absent(),
     this.index = const Value.absent(),
     this.title = const Value.absent(),
-    this.content = const Value.absent(),
     this.color = const Value.absent(),
   });
   NoteBatchesCompanion.insert({
     this.id = const Value.absent(),
     required int index,
     required String title,
-    required String content,
     required int color,
   })  : index = Value(index),
         title = Value(title),
-        content = Value(content),
         color = Value(color);
   static Insertable<NoteBatchRow> custom({
     Expression<int>? id,
     Expression<int>? index,
     Expression<String>? title,
-    Expression<String>? content,
     Expression<int>? color,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (index != null) 'index': index,
       if (title != null) 'title': title,
-      if (content != null) 'content': content,
       if (color != null) 'color': color,
     });
   }
@@ -589,13 +569,11 @@ class NoteBatchesCompanion extends UpdateCompanion<NoteBatchRow> {
       {Value<int>? id,
       Value<int>? index,
       Value<String>? title,
-      Value<String>? content,
       Value<int>? color}) {
     return NoteBatchesCompanion(
       id: id ?? this.id,
       index: index ?? this.index,
       title: title ?? this.title,
-      content: content ?? this.content,
       color: color ?? this.color,
     );
   }
@@ -612,9 +590,6 @@ class NoteBatchesCompanion extends UpdateCompanion<NoteBatchRow> {
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
-    if (content.present) {
-      map['content'] = Variable<String>(content.value);
-    }
     if (color.present) {
       map['color'] = Variable<int>(color.value);
     }
@@ -627,7 +602,6 @@ class NoteBatchesCompanion extends UpdateCompanion<NoteBatchRow> {
           ..write('id: $id, ')
           ..write('index: $index, ')
           ..write('title: $title, ')
-          ..write('content: $content, ')
           ..write('color: $color')
           ..write(')'))
         .toString();
