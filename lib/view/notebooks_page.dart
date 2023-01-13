@@ -657,6 +657,7 @@ class NoteBooksPage extends StatelessWidget {
       context: context,
       builder: (context) {
         return Consumer(builder: (context, ref, build) {
+          final noteBooksPageState = ref.watch(noteBooksPageStateProvider);
           return AlertDialog(
             title: const Text("delete notepage"),
             content:
@@ -672,6 +673,11 @@ class NoteBooksPage extends StatelessWidget {
                 child: const Text("continue"),
                 onPressed: () {
                   Navigator.pop(context);
+                  if (noteBooksPageState.openingNotePageId == id) {
+                    ref
+                        .read(noteBooksPageStateProvider.notifier)
+                        .closeNotePage();
+                  }
                   ref.read(notePagesProvider.notifier).deleteNotePage(id);
                 },
               ),
