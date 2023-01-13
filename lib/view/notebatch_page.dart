@@ -88,6 +88,7 @@ class NoteBatchPage extends StatelessWidget {
       builder: (context) {
         return Consumer(builder: (context, ref, child) {
           final nameTextController = TextEditingController();
+          Color selectedColor = const Color.fromARGB(255, 50, 150, 120);
           return AlertDialog(
             title: const Text("Create Batch"),
             content: Column(
@@ -101,6 +102,13 @@ class NoteBatchPage extends StatelessWidget {
                     labelText: "title",
                     hintText: "20 characters or less",
                   ),
+                ),
+                const Text("color"),
+                ColorSlider(
+                  initialColor: selectedColor,
+                  onChanged: (value) {
+                    selectedColor = value;
+                  },
                 ),
               ],
             ),
@@ -116,7 +124,9 @@ class NoteBatchPage extends StatelessWidget {
                   if (nameTextController.text.isNotEmpty) {
                     Navigator.pop(context);
                     ref.read(noteBatchesProvider.notifier).createNoteBatch(
-                        nameTextController.text, Colors.black38);
+                          nameTextController.text,
+                          selectedColor,
+                        );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("empty name !!"),
@@ -154,7 +164,7 @@ class NoteBatchPage extends StatelessWidget {
                     maxLength: 20,
                     maxLines: 1,
                     decoration: const InputDecoration(
-                      labelText: "Batch Name",
+                      labelText: "title",
                       hintText: "20 characters or less",
                     ),
                   ),

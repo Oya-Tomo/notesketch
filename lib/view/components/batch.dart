@@ -9,14 +9,17 @@ class NotePageBatch extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(2),
-      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 7),
       decoration: BoxDecoration(
         color: Color(color),
         borderRadius: BorderRadius.circular(100),
       ),
       child: Text(
         title,
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+        ),
       ),
     );
   }

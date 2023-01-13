@@ -63,6 +63,7 @@ class NoteBooksPage extends StatelessWidget {
                   color: Color.fromRGBO(0, 0, 0, 0.451),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
@@ -76,16 +77,28 @@ class NoteBooksPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Row(
-                      children: noteBatches
-                          .where((batch) =>
-                              openingNotePage.batchesId.contains(batch.id))
-                          .map((batch) {
-                        return NotePageBatch(
-                          title: batch.title,
-                          color: batch.color,
-                        );
-                      }).toList(),
+                    SizedBox(
+                      height: 30,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: noteBatches
+                                  .where((batch) => openingNotePage.batchesId
+                                      .contains(batch.id))
+                                  .map((batch) {
+                                return Center(
+                                  child: NotePageBatch(
+                                    title: batch.title,
+                                    color: batch.color,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -470,14 +483,26 @@ class NoteBooksPage extends StatelessWidget {
                     key: GlobalKey(),
                     leading: const Icon(Icons.description),
                     title: Text(notePage.title),
-                    subtitle: Row(
-                      children: noteBatches
-                          .where(
-                              (batch) => notePage.batchesId.contains(batch.id))
-                          .map((batch) {
-                        return NotePageBatch(
-                            title: batch.title, color: batch.color);
-                      }).toList(),
+                    subtitle: SizedBox(
+                      height: 30,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: noteBatches
+                                  .where((batch) =>
+                                      notePage.batchesId.contains(batch.id))
+                                  .map((batch) {
+                                return Center(
+                                  child: NotePageBatch(
+                                      title: batch.title, color: batch.color),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     trailing: PopupMenuButton(
                       icon: const Icon(Icons.more_horiz),
