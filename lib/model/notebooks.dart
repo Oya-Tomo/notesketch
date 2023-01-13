@@ -51,7 +51,7 @@ class NoteBooksStateNotifier extends StateNotifier<List<NoteBook>> {
   NoteBooksStateNotifier() : super([]);
   final DataBase _database = DataBase();
 
-  Future<void> fetchAllData() async {
+  void fetchAllData() async {
     final rows = await _database.select(_database.noteBooks).get();
     rows.sort((a, b) => a.index.compareTo(b.index));
     state = rows.map((row) => NoteBook.fromRow(row: row)).toList();

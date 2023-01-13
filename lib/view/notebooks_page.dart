@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notesketch/model/notebatches.dart';
 import 'package:notesketch/model/notebooks.dart';
 import 'package:notesketch/model/notepages.dart';
 import 'package:notesketch/view/color_themes.dart';
 import 'package:notesketch/view/components/batch.dart';
+import 'package:notesketch/view/components/batch_selector.dart';
 import 'package:notesketch/view/components/gradient_button.dart';
 import 'package:notesketch/view/components/gradient_divider.dart';
+import 'package:notesketch/view/notebatch_page.dart';
 import 'package:notesketch/view/utils.dart';
 import 'package:notesketch/view_model/notebooks_page_model.dart';
 
@@ -46,6 +49,8 @@ class NoteBooksPage extends StatelessWidget {
     return Consumer(
       builder: (context, ref, child) {
         final noteBooksPageState = ref.watch(noteBooksPageStateProvider);
+        final noteBatches = ref.watch(noteBatchesProvider);
+        ref.watch(notePagesProvider);
         if (noteBooksPageState.openingNotePageId != null) {
           final openingNotePage = ref
               .watch(notePagesProvider.notifier)
@@ -53,7 +58,7 @@ class NoteBooksPage extends StatelessWidget {
           return Column(
             children: [
               Container(
-                padding: EdgeInsets.all(15),
+                padding: const EdgeInsets.all(15),
                 decoration: const BoxDecoration(
                   color: Color.fromRGBO(0, 0, 0, 0.451),
                 ),
@@ -72,9 +77,14 @@ class NoteBooksPage extends StatelessWidget {
                       ],
                     ),
                     Row(
-                      children: openingNotePage.batches.map((batch) {
+                      children: noteBatches
+                          .where((batch) =>
+                              openingNotePage.batchesId.contains(batch.id))
+                          .map((batch) {
                         return NotePageBatch(
-                            title: batch.title, color: batch.color);
+                          title: batch.title,
+                          color: batch.color,
+                        );
                       }).toList(),
                     ),
                   ],
@@ -87,6 +97,7 @@ class NoteBooksPage extends StatelessWidget {
                       .textEditingController,
                   maxLines: null,
                   expands: true,
+                  autofocus: false,
                 ),
               ),
             ],
@@ -171,7 +182,7 @@ class NoteBooksPage extends StatelessWidget {
                     subtitle:
                         Text("updated : ${formatDateTime(noteBook.updatedAt)}"),
                     trailing: PopupMenuButton(
-                      child: const Icon(Icons.more_horiz),
+                      icon: const Icon(Icons.more_horiz),
                       onSelected: (value) {
                         if (value == "rename") {
                           showRenameNoteBookDialog(context, noteBook.id);
@@ -231,18 +242,15 @@ class NoteBooksPage extends StatelessWidget {
         return Consumer(builder: (context, ref, child) {
           return AlertDialog(
             title: const Text("create notebook"),
-            content: SizedBox(
-              width: 200,
-              height: 100,
-              child: Column(
-                children: [
-                  TextField(
-                    controller: nameTextController,
-                    maxLength: 40,
-                    maxLines: 1,
-                  ),
-                ],
-              ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameTextController,
+                  maxLength: 40,
+                  maxLines: 1,
+                ),
+              ],
             ),
             actions: [
               TextButton(
@@ -282,18 +290,15 @@ class NoteBooksPage extends StatelessWidget {
         return Consumer(builder: (context, ref, child) {
           return AlertDialog(
             title: const Text("rename notebook"),
-            content: SizedBox(
-              width: 200,
-              height: 100,
-              child: Column(
-                children: [
-                  TextField(
-                    controller: nameTextController,
-                    maxLength: 40,
-                    maxLines: 1,
-                  ),
-                ],
-              ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameTextController,
+                  maxLength: 40,
+                  maxLines: 1,
+                ),
+              ],
             ),
             actions: [
               TextButton(
@@ -374,10 +379,11 @@ class NoteBooksPage extends StatelessWidget {
   Widget notePageList() {
     return Consumer(builder: (context, ref, child) {
       final notePages = ref.watch(notePagesProvider);
+      final noteBatches = ref.watch(noteBatchesProvider);
       final notePageState = ref.watch(noteBooksPageStateProvider);
       if (notePageState.openingNoteBookId != null) {
         final openingNoteBook =
-            ref.read(noteBooksProvider.notifier).getNoteBook(
+            ref.watch(noteBooksProvider.notifier).getNoteBook(
                   notePageState.openingNoteBookId!,
                 );
         return Column(
@@ -420,6 +426,18 @@ class NoteBooksPage extends StatelessWidget {
                     .switchDrawerBack();
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.arrow_forward),
+              title: const Text("Go to batch list"),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NoteBatchPage(),
+                  ),
+                );
+              },
+            ),
             const GradientDivider(gradient: gradient),
             Container(
               padding: const EdgeInsets.all(10),
@@ -450,19 +468,41 @@ class NoteBooksPage extends StatelessWidget {
                     key: GlobalKey(),
                     leading: const Icon(Icons.description),
                     title: Text(notePage.title),
-                    subtitle:
-                        Text("updated : ${formatDateTime(notePage.updatedAt)}"),
-                    // TODO : add batch list
+                    subtitle: Row(
+                      children: noteBatches
+                          .where(
+                              (batch) => notePage.batchesId.contains(batch.id))
+                          .map((batch) {
+                        return NotePageBatch(
+                            title: batch.title, color: batch.color);
+                      }).toList(),
+                    ),
                     trailing: PopupMenuButton(
-                      child: const Icon(Icons.more_horiz),
+                      icon: const Icon(Icons.more_horiz),
                       onSelected: (value) {
-                        if (value == "rename") {
+                        if (value == "add batch") {
+                          if (noteBatches.length != notePage.batchesId.length) {
+                            showAddNotePageBatchDialog(context, notePage.id);
+                          }
+                        } else if (value == "delete batch") {
+                          if (notePage.batchesId.isNotEmpty) {
+                            showDeleteNotePageBatchDialog(context, notePage.id);
+                          }
+                        } else if (value == "rename") {
                           showRenameNotePageDialog(context, notePage.id);
                         } else {
                           showDeleteNotePageDialog(context, notePage.id);
                         }
                       },
                       itemBuilder: (context) => const [
+                        PopupMenuItem(
+                          value: "add batch",
+                          child: Text("add batch"),
+                        ),
+                        PopupMenuItem(
+                          value: "delete batch",
+                          child: Text("delete batch"),
+                        ),
                         PopupMenuItem(
                           value: "rename",
                           child: Text("rename"),
@@ -485,6 +525,8 @@ class NoteBooksPage extends StatelessWidget {
                           .openNotePage(notePage.id, notePage.content);
                     },
                     selected: notePageState.openingNotePageId == notePage.id,
+                    selectedColor: Colors.white,
+                    selectedTileColor: Colors.black12,
                   );
                 }).toList(),
               ),
@@ -522,18 +564,15 @@ class NoteBooksPage extends StatelessWidget {
         return Consumer(builder: (context, ref, child) {
           return AlertDialog(
             title: const Text("create notepage"),
-            content: SizedBox(
-              width: 200,
-              height: 100,
-              child: Column(
-                children: [
-                  TextField(
-                    controller: nameTextController,
-                    maxLength: 40,
-                    maxLines: 1,
-                  ),
-                ],
-              ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameTextController,
+                  maxLength: 40,
+                  maxLines: 1,
+                ),
+              ],
             ),
             actions: [
               TextButton(
@@ -573,18 +612,15 @@ class NoteBooksPage extends StatelessWidget {
         return Consumer(builder: (context, ref, child) {
           return AlertDialog(
             title: const Text("rename notepage"),
-            content: SizedBox(
-              width: 200,
-              height: 100,
-              child: Column(
-                children: [
-                  TextField(
-                    controller: nameTextController,
-                    maxLength: 40,
-                    maxLines: 1,
-                  ),
-                ],
-              ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameTextController,
+                  maxLength: 40,
+                  maxLines: 1,
+                ),
+              ],
             ),
             actions: [
               TextButton(
@@ -642,6 +678,110 @@ class NoteBooksPage extends StatelessWidget {
             ],
           );
         });
+      },
+    );
+  }
+
+  void showAddNotePageBatchDialog(BuildContext context, int id) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final notePage =
+                ref.read(notePagesProvider.notifier).getNotePage(id)!;
+            final noteBatches = ref
+                .watch(noteBatchesProvider)
+                .where((batch) => !notePage.batchesId.contains(batch.id))
+                .toList();
+            int? selectedValue;
+            return AlertDialog(
+              title: const Text("Add Batch"),
+              content: NoteBatchSelector(
+                batches: noteBatches,
+                onChanged: (value) {
+                  selectedValue = value;
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    if (selectedValue != null) {
+                      ref
+                          .read(notePagesProvider.notifier)
+                          .addNotePageBatch(id, selectedValue!);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("select anyone !!"),
+                        duration: Duration(seconds: 3),
+                      ));
+                    }
+                  },
+                  child: const Text("continue"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void showDeleteNotePageBatchDialog(BuildContext context, int id) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final notePage =
+                ref.read(notePagesProvider.notifier).getNotePage(id)!;
+            final noteBatches = ref
+                .watch(noteBatchesProvider)
+                .where((batch) => notePage.batchesId.contains(batch.id))
+                .toList();
+            int? selectedValue;
+            return AlertDialog(
+              title: const Text("Delete Batch"),
+              content: NoteBatchSelector(
+                batches: noteBatches,
+                onChanged: (value) {
+                  selectedValue = value;
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (selectedValue != null) {
+                      Navigator.pop(context);
+                      ref
+                          .read(notePagesProvider.notifier)
+                          .deleteNotePageBatch(id, selectedValue!);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("select anyone"),
+                        duration: Duration(seconds: 3),
+                      ));
+                    }
+                  },
+                  child: const Text("continue"),
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }

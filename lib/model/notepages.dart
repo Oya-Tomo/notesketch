@@ -2,7 +2,6 @@ import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notesketch/database/database.dart';
-import 'package:notesketch/model/notebatches.dart';
 
 @immutable
 class NotePage {
@@ -10,14 +9,14 @@ class NotePage {
     required this.id,
     required this.title,
     required this.content,
-    required this.batches,
+    required this.batchesId,
     required this.createdAt,
     required this.updatedAt,
   });
   final int id;
   final String title;
   final String content;
-  final List<NoteBatch> batches;
+  final List<int> batchesId;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -28,7 +27,7 @@ class NotePage {
       id: row.id,
       title: row.title,
       content: row.content,
-      batches: const [],
+      batchesId: const [],
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     );
@@ -38,7 +37,7 @@ class NotePage {
     int? id,
     String? title,
     String? content,
-    List<NoteBatch>? batches,
+    List<int>? batchesId,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -46,7 +45,7 @@ class NotePage {
       id: id ?? this.id,
       title: title ?? this.title,
       content: content ?? this.content,
-      batches: batches ?? this.batches,
+      batchesId: batchesId ?? this.batchesId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -84,16 +83,14 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
     state = rowPages.map((rowPage) {
       final filteredEntries =
           rowEntries.where((entry) => entry.notePageId == rowPage.id).toList();
-      final filteredBatches = [];
+      List<NoteBatchRow> filteredBatches = [];
       for (final entry in filteredEntries) {
         filteredBatches
             .addAll(rowBatches.where((batch) => batch.id == entry.noteBatchId));
       }
 
       final page = NotePage.fromRow(row: rowPage).copyWith(
-        batches: filteredBatches
-            .map((batch) => NoteBatch.fromRow(row: batch))
-            .toList(),
+        batchesId: filteredBatches.map((batch) => batch.id).toList(),
       );
 
       return page;
@@ -117,7 +114,7 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
         id: notePageId,
         title: title,
         content: "",
-        batches: const [],
+        batchesId: const [],
         createdAt: currentTime,
         updatedAt: currentTime,
       ),
@@ -198,19 +195,11 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
             noteBatchId: batchId,
           ),
         ));
-
-    final batch = await (_database.select(_database.noteBatches)
-          ..where((tbl) => tbl.id.equals(batchId)))
-        .getSingle();
-
     state = [
       for (final page in state)
         if (page.id == id)
           page.copyWith(
-            batches: [
-              ...page.batches,
-              NoteBatch.fromRow(row: batch),
-            ],
+            batchesId: [...page.batchesId, batchId],
           )
         else
           page,
@@ -227,8 +216,7 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
       for (final page in state)
         if (page.id == id)
           page.copyWith(
-            batches:
-                page.batches.where((batch) => batch.id != batchId).toList(),
+            batchesId: page.batchesId.where((bid) => bid != batchId).toList(),
           )
         else
           page,
@@ -236,12 +224,10 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
   }
 
   Future<void> deleteAllNotePageBatches(int batchId) async {
-    // only delete batches in state
     state = state
         .map(
           (page) => page.copyWith(
-            batches:
-                page.batches.where((batch) => batch.id != batchId).toList(),
+            batchesId: page.batchesId.where((bid) => bid != batchId).toList(),
           ),
         )
         .toList();
