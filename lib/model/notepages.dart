@@ -148,6 +148,28 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
     state = state.where((notePage) => notePage.id != id).toList();
   }
 
+  Future<void> saveNotePage(int id, String content) async {
+    final currentTime = DateTime.now();
+    await (_database.update(_database.notePages)
+          ..where((tbl) => tbl.id.equals(id)))
+        .write(
+      NotePagesCompanion(
+        content: Value(content),
+        updatedAt: Value(currentTime),
+      ),
+    );
+    state = [
+      for (final page in state)
+        if (page.id == id)
+          page.copyWith(
+            content: content,
+            updatedAt: currentTime,
+          )
+        else
+          page,
+    ];
+  }
+
   Future<void> renameNotePage(int id, String title) async {
     final currentTime = DateTime.now();
     await (_database.update(_database.notePages)

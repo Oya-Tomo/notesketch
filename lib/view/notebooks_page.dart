@@ -58,49 +58,74 @@ class NoteBooksPage extends StatelessWidget {
           return Column(
             children: [
               Container(
-                padding: const EdgeInsets.all(15),
                 decoration: const BoxDecoration(
-                  color: Color.fromRGBO(0, 0, 0, 0.451),
+                  color: Color.fromARGB(255, 10, 10, 10),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                    children: [
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(12),
                           child: Icon(Icons.description),
                         ),
-                        Text(
-                          openingNotePage.title,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 30,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: noteBatches
-                                  .where((batch) => openingNotePage.batchesId
-                                      .contains(batch.id))
-                                  .map((batch) {
-                                return Center(
-                                  child: NotePageBatch(
-                                    title: batch.title,
-                                    color: batch.color,
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ],
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                openingNotePage.title,
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              SizedBox(
+                                height: 30,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: noteBatches
+                                            .where((batch) => openingNotePage
+                                                .batchesId
+                                                .contains(batch.id))
+                                            .map((batch) {
+                                          return Center(
+                                            child: NotePageBatch(
+                                              title: batch.title,
+                                              color: batch.color,
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: IconButton(
+                          icon: const Icon(Icons.save),
+                          onPressed: () {
+                            ref.read(notePagesProvider.notifier).saveNotePage(
+                                  openingNotePage.id,
+                                  ref
+                                      .watch(
+                                          noteBooksPageStateProvider.notifier)
+                                      .textEditingController
+                                      .text,
+                                );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Expanded(
@@ -118,7 +143,11 @@ class NoteBooksPage extends StatelessWidget {
         } else {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [Center(child: Text("Please open any page."))],
+            children: const [
+              Center(
+                child: Text("Please open any page."),
+              ),
+            ],
           );
         }
       },
