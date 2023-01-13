@@ -221,6 +221,8 @@ class NoteBooksPage extends StatelessWidget {
                             .watch(noteBooksPageStateProvider)
                             .openingNoteBookId ==
                         noteBook.id,
+                    selectedColor: Colors.white,
+                    selectedTileColor: Colors.black12,
                   );
                 }).toList(),
                 onReorder: (oldIndex, newIndex) {
@@ -703,11 +705,16 @@ class NoteBooksPage extends StatelessWidget {
             int? selectedValue;
             return AlertDialog(
               title: const Text("Add Batch"),
-              content: NoteBatchSelector(
-                batches: noteBatches,
-                onChanged: (value) {
-                  selectedValue = value;
-                },
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  NoteBatchSelector(
+                    batches: noteBatches,
+                    onChanged: (value) {
+                      selectedValue = value;
+                    },
+                  ),
+                ],
               ),
               actions: [
                 TextButton(
@@ -755,11 +762,16 @@ class NoteBooksPage extends StatelessWidget {
             int? selectedValue;
             return AlertDialog(
               title: const Text("Delete Batch"),
-              content: NoteBatchSelector(
-                batches: noteBatches,
-                onChanged: (value) {
-                  selectedValue = value;
-                },
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  NoteBatchSelector(
+                    batches: noteBatches,
+                    onChanged: (value) {
+                      selectedValue = value;
+                    },
+                  ),
+                ],
               ),
               actions: [
                 TextButton(

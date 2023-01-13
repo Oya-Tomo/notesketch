@@ -26,27 +26,29 @@ class _NoteBatchSelectorState extends State<NoteBatchSelector> {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton(
-      value: selectedBatch,
-      items: widget.batches.map((batch) {
-        return DropdownMenuItem(
-          value: batch,
-          child: NotePageBatch(
-            title: batch.title,
-            color: batch.color,
-          ),
-        );
-      }).toList(),
-      onChanged: (value) {
-        setState(
-          () {
-            selectedBatch = value ?? selectedBatch;
-          },
-        );
-        if (widget.onChanged != null) {
-          widget.onChanged!(value!.id);
-        }
-      },
+    return Center(
+      child: DropdownButton(
+        value: selectedBatch,
+        items: widget.batches.map((batch) {
+          return DropdownMenuItem(
+            value: batch,
+            child: NotePageBatch(
+              title: batch.title,
+              color: batch.color,
+            ),
+          );
+        }).toList(),
+        onChanged: (value) {
+          setState(
+            () {
+              selectedBatch = value ?? selectedBatch;
+            },
+          );
+          if (widget.onChanged != null) {
+            widget.onChanged!(value!.id);
+          }
+        },
+      ),
     );
   }
 }
