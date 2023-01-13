@@ -47,7 +47,7 @@ class NoteBatchPage extends StatelessWidget {
                 trailing: PopupMenuButton(
                   icon: const Icon(Icons.more_horiz),
                   onSelected: (value) {
-                    if (value == "edit") {
+                    if (value == "Edit") {
                       showEditNoteBatchDialog(context, batch.id);
                     } else {
                       showDeleteNoteBatchDialog(context, batch.id);
@@ -55,13 +55,13 @@ class NoteBatchPage extends StatelessWidget {
                   },
                   itemBuilder: (context) => const [
                     PopupMenuItem(
-                      value: "edit",
-                      child: Text("edit"),
+                      value: "Edit",
+                      child: Text("Edit"),
                     ),
                     PopupMenuItem(
-                      value: "delete",
+                      value: "Delete",
                       child: Text(
-                        "delete",
+                        "Delete",
                         style: TextStyle(
                           color: Colors.red,
                         ),
@@ -99,11 +99,11 @@ class NoteBatchPage extends StatelessWidget {
                   maxLength: 20,
                   maxLines: 1,
                   decoration: const InputDecoration(
-                    labelText: "title",
+                    labelText: "Title",
                     hintText: "20 characters or less",
                   ),
                 ),
-                const Text("color"),
+                const Text("Color"),
                 ColorSlider(
                   initialColor: selectedColor,
                   onChanged: (value) {
@@ -117,7 +117,7 @@ class NoteBatchPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text("cancel"),
+                child: const Text("Cancel"),
               ),
               TextButton(
                 onPressed: () {
@@ -129,12 +129,12 @@ class NoteBatchPage extends StatelessWidget {
                         );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("empty name !!"),
+                      content: Text("Empty name !!"),
                       duration: Duration(seconds: 3),
                     ));
                   }
                 },
-                child: const Text("continue"),
+                child: const Text("Continue"),
               ),
             ],
           );
@@ -164,11 +164,11 @@ class NoteBatchPage extends StatelessWidget {
                     maxLength: 20,
                     maxLines: 1,
                     decoration: const InputDecoration(
-                      labelText: "title",
+                      labelText: "Title",
                       hintText: "20 characters or less",
                     ),
                   ),
-                  const Text("color"),
+                  const Text("Color"),
                   ColorSlider(
                     initialColor: selectedColor,
                     onChanged: (value) {
@@ -182,7 +182,7 @@ class NoteBatchPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text("cancel"),
+                  child: const Text("Cancel"),
                 ),
                 TextButton(
                   onPressed: () {
@@ -195,7 +195,7 @@ class NoteBatchPage extends StatelessWidget {
                           );
                     }
                   },
-                  child: const Text("continue"),
+                  child: const Text("Continue"),
                 ),
               ],
             );
@@ -231,7 +231,7 @@ class NoteBatchPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text("cancel"),
+                  child: const Text("Cancel"),
                 ),
                 TextButton(
                   onPressed: () {
@@ -241,7 +241,7 @@ class NoteBatchPage extends StatelessWidget {
                         .deleteAllNotePageBatches(id);
                     ref.read(noteBatchesProvider.notifier).deleteNoteBatch(id);
                   },
-                  child: const Text("continue"),
+                  child: const Text("Continue"),
                 ),
               ],
             );

@@ -121,6 +121,12 @@ class NoteBooksPage extends StatelessWidget {
                                       .textEditingController
                                       .text,
                                 );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Saved"),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -221,12 +227,16 @@ class NoteBooksPage extends StatelessWidget {
                     key: GlobalKey(),
                     leading: const Icon(Icons.menu_book),
                     title: Text(noteBook.title),
-                    subtitle:
-                        Text("updated : ${formatDateTime(noteBook.updatedAt)}"),
+                    subtitle: Text(
+                      "Updated : ${formatDateTime(noteBook.updatedAt)}",
+                      style: const TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
                     trailing: PopupMenuButton(
                       icon: const Icon(Icons.more_horiz),
                       onSelected: (value) {
-                        if (value == "rename") {
+                        if (value == "Rename") {
                           showRenameNoteBookDialog(context, noteBook.id);
                         } else {
                           showDeleteNoteBookDialog(context, noteBook.id);
@@ -234,13 +244,13 @@ class NoteBooksPage extends StatelessWidget {
                       },
                       itemBuilder: (context) => const [
                         PopupMenuItem(
-                          value: "rename",
-                          child: Text("rename"),
+                          value: "Rename",
+                          child: Text("Rename"),
                         ),
                         PopupMenuItem(
-                          value: "delete",
+                          value: "Delete",
                           child: Text(
-                            "delete",
+                            "Delete",
                             style: TextStyle(
                               color: Colors.red,
                             ),
@@ -285,7 +295,7 @@ class NoteBooksPage extends StatelessWidget {
         final nameTextController = TextEditingController();
         return Consumer(builder: (context, ref, child) {
           return AlertDialog(
-            title: const Text("create notebook"),
+            title: const Text("Create notebook"),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -298,17 +308,17 @@ class NoteBooksPage extends StatelessWidget {
             ),
             actions: [
               TextButton(
-                child: const Text("cancel"),
+                child: const Text("Cancel"),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               TextButton(
-                child: const Text("continue"),
+                child: const Text("Continue"),
                 onPressed: () async {
                   if (nameTextController.text == "") {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("empty name !!"),
+                      content: Text("Empty name !!"),
                       duration: Duration(seconds: 3),
                     ));
                   } else {
@@ -333,7 +343,7 @@ class NoteBooksPage extends StatelessWidget {
         final nameTextController = TextEditingController();
         return Consumer(builder: (context, ref, child) {
           return AlertDialog(
-            title: const Text("rename notebook"),
+            title: const Text("Rename notebook"),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -346,17 +356,17 @@ class NoteBooksPage extends StatelessWidget {
             ),
             actions: [
               TextButton(
-                child: const Text("cancel"),
+                child: const Text("Cancel"),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               TextButton(
-                child: const Text("continue"),
+                child: const Text("Continue"),
                 onPressed: () {
                   if (nameTextController.text == "") {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("empty name !!"),
+                      content: Text("Empty name !!"),
                       duration: Duration(seconds: 3),
                     ));
                   } else {
@@ -381,18 +391,18 @@ class NoteBooksPage extends StatelessWidget {
         return Consumer(builder: (context, ref, build) {
           final noteBooksPageState = ref.watch(noteBooksPageStateProvider);
           return AlertDialog(
-            title: const Text("delete notebook"),
+            title: const Text("Delete notebook"),
             content:
                 const Text("The notebook is\npermanently deleted.\nIs it OK?"),
             actions: [
               TextButton(
-                child: const Text("cancel"),
+                child: const Text("Cancel"),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               TextButton(
-                child: const Text("continue"),
+                child: const Text("Continue"),
                 onPressed: () {
                   Navigator.pop(context);
                   if (noteBooksPageState.openingNoteBookId == id) {
@@ -451,11 +461,11 @@ class NoteBooksPage extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      "updated : ${formatDateTime(openingNoteBook.updatedAt)}",
+                      "Updated : ${formatDateTime(openingNoteBook.updatedAt)}",
                       style: const TextStyle(fontSize: 12),
                     ),
                     Text(
-                        "created : ${formatDateTime(openingNoteBook.createdAt)}",
+                        "Created : ${formatDateTime(openingNoteBook.createdAt)}",
                         style: const TextStyle(fontSize: 12))
                   ],
                 ),
@@ -544,15 +554,15 @@ class NoteBooksPage extends StatelessWidget {
                     trailing: PopupMenuButton(
                       icon: const Icon(Icons.more_horiz),
                       onSelected: (value) {
-                        if (value == "add batch") {
+                        if (value == "Add batch") {
                           if (noteBatches.length != notePage.batchesId.length) {
                             showAddNotePageBatchDialog(context, notePage.id);
                           }
-                        } else if (value == "delete batch") {
+                        } else if (value == "Delete batch") {
                           if (notePage.batchesId.isNotEmpty) {
                             showDeleteNotePageBatchDialog(context, notePage.id);
                           }
-                        } else if (value == "rename") {
+                        } else if (value == "Rename") {
                           showRenameNotePageDialog(context, notePage.id);
                         } else {
                           showDeleteNotePageDialog(context, notePage.id);
@@ -560,21 +570,21 @@ class NoteBooksPage extends StatelessWidget {
                       },
                       itemBuilder: (context) => const [
                         PopupMenuItem(
-                          value: "add batch",
-                          child: Text("add batch"),
+                          value: "Add batch",
+                          child: Text("Add batch"),
                         ),
                         PopupMenuItem(
-                          value: "delete batch",
-                          child: Text("delete batch"),
+                          value: "Delete batch",
+                          child: Text("Delete batch"),
                         ),
                         PopupMenuItem(
-                          value: "rename",
-                          child: Text("rename"),
+                          value: "Rename",
+                          child: Text("Rename"),
                         ),
                         PopupMenuItem(
-                          value: "delete",
+                          value: "Delete",
                           child: Text(
-                            "delete",
+                            "Delete",
                             style: TextStyle(
                               color: Colors.red,
                             ),
@@ -627,7 +637,7 @@ class NoteBooksPage extends StatelessWidget {
         final nameTextController = TextEditingController();
         return Consumer(builder: (context, ref, child) {
           return AlertDialog(
-            title: const Text("create notepage"),
+            title: const Text("Create notepage"),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -640,17 +650,17 @@ class NoteBooksPage extends StatelessWidget {
             ),
             actions: [
               TextButton(
-                child: const Text("cancel"),
+                child: const Text("Cancel"),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               TextButton(
-                child: const Text("continue"),
+                child: const Text("Continue"),
                 onPressed: () async {
                   if (nameTextController.text == "") {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("empty name !!"),
+                      content: Text("Empty name !!"),
                       duration: Duration(seconds: 3),
                     ));
                   } else {
@@ -675,7 +685,7 @@ class NoteBooksPage extends StatelessWidget {
         final nameTextController = TextEditingController();
         return Consumer(builder: (context, ref, child) {
           return AlertDialog(
-            title: const Text("rename notepage"),
+            title: const Text("Rename notepage"),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -688,17 +698,17 @@ class NoteBooksPage extends StatelessWidget {
             ),
             actions: [
               TextButton(
-                child: const Text("cancel"),
+                child: const Text("Cancel"),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               TextButton(
-                child: const Text("continue"),
+                child: const Text("Continue"),
                 onPressed: () {
                   if (nameTextController.text == "") {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("empty name !!"),
+                      content: Text("Empty name !!"),
                       duration: Duration(seconds: 3),
                     ));
                   } else {
@@ -723,18 +733,18 @@ class NoteBooksPage extends StatelessWidget {
         return Consumer(builder: (context, ref, build) {
           final noteBooksPageState = ref.watch(noteBooksPageStateProvider);
           return AlertDialog(
-            title: const Text("delete notepage"),
+            title: const Text("Delete notepage"),
             content:
                 const Text("The notepage is\npermanently deleted.\nIs it OK?"),
             actions: [
               TextButton(
-                child: const Text("cancel"),
+                child: const Text("Cancel"),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               TextButton(
-                child: const Text("continue"),
+                child: const Text("Continue"),
                 onPressed: () {
                   Navigator.pop(context);
                   if (noteBooksPageState.openingNotePageId == id) {
@@ -783,7 +793,7 @@ class NoteBooksPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text("cancel"),
+                  child: const Text("Cancel"),
                 ),
                 TextButton(
                   onPressed: () {
@@ -794,12 +804,12 @@ class NoteBooksPage extends StatelessWidget {
                           .addNotePageBatch(id, selectedValue!);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("select anyone !!"),
+                        content: Text("Select anyone !!"),
                         duration: Duration(seconds: 3),
                       ));
                     }
                   },
-                  child: const Text("continue"),
+                  child: const Text("Continue"),
                 ),
               ],
             );
@@ -840,7 +850,7 @@ class NoteBooksPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text("cancel"),
+                  child: const Text("Cancel"),
                 ),
                 TextButton(
                   onPressed: () {
@@ -851,12 +861,12 @@ class NoteBooksPage extends StatelessWidget {
                           .deleteNotePageBatch(id, selectedValue!);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("select anyone"),
+                        content: Text("Select anyone"),
                         duration: Duration(seconds: 3),
                       ));
                     }
                   },
-                  child: const Text("continue"),
+                  child: const Text("Continue"),
                 ),
               ],
             );
