@@ -479,31 +479,39 @@ class NoteBooksPage extends StatelessWidget {
                       .reorderNotePages(oldIndex, newIndex);
                 },
                 children: notePages.map((notePage) {
+                  final filterdBatches = noteBatches
+                      .where((batch) => notePage.batchesId.contains(batch.id));
                   return ListTile(
                     key: GlobalKey(),
                     leading: const Icon(Icons.description),
                     title: Text(notePage.title),
-                    subtitle: SizedBox(
-                      height: 30,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: noteBatches
-                                  .where((batch) =>
-                                      notePage.batchesId.contains(batch.id))
-                                  .map((batch) {
-                                return Center(
-                                  child: NotePageBatch(
-                                      title: batch.title, color: batch.color),
-                                );
-                              }).toList(),
+                    subtitle: filterdBatches.isNotEmpty
+                        ? SizedBox(
+                            height: 30,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: ListView(
+                                    scrollDirection: Axis.horizontal,
+                                    children: filterdBatches.map((batch) {
+                                      return Center(
+                                        child: NotePageBatch(
+                                          title: batch.title,
+                                          color: batch.color,
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : const Text(
+                            "no batches...",
+                            style: TextStyle(
+                              color: Colors.white38,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
                     trailing: PopupMenuButton(
                       icon: const Icon(Icons.more_horiz),
                       onSelected: (value) {
