@@ -38,9 +38,9 @@ class NoteBatch {
 
 class NoteBatchesStateNotifier extends StateNotifier<List<NoteBatch>> {
   NoteBatchesStateNotifier() : super([]);
-  final DataBase _database = DataBase();
+  // final DataBase database = DataBase();
   void fetchData() async {
-    final rows = (await _database.select(_database.noteBatches).get())
+    final rows = (await database.select(database.noteBatches).get())
       ..sort((a, b) => a.index.compareTo(b.index));
     state = rows.map((row) => NoteBatch.fromRow(row: row)).toList();
   }
@@ -55,7 +55,7 @@ class NoteBatchesStateNotifier extends StateNotifier<List<NoteBatch>> {
   }
 
   Future<void> createNoteBatch(String title, Color color) async {
-    final batchId = await (_database.into(_database.noteBatches).insert(
+    final batchId = await (database.into(database.noteBatches).insert(
           NoteBatchesCompanion.insert(
             index: state.length,
             title: title,
@@ -69,7 +69,7 @@ class NoteBatchesStateNotifier extends StateNotifier<List<NoteBatch>> {
   }
 
   Future<void> editNoteBatch(int id, String title, Color color) async {
-    await (_database.update(_database.noteBatches)
+    await (database.update(database.noteBatches)
           ..where((tbl) => tbl.id.equals(id)))
         .write(
       NoteBatchesCompanion(
@@ -88,10 +88,10 @@ class NoteBatchesStateNotifier extends StateNotifier<List<NoteBatch>> {
   }
 
   Future<void> deleteNoteBatch(int id) async {
-    await (_database.delete(_database.notePageBatchEntries)
+    await (database.delete(database.notePageBatchEntries)
           ..where((tbl) => tbl.noteBatchId.equals(id)))
         .go();
-    await (_database.delete(_database.noteBatches)
+    await (database.delete(database.noteBatches)
           ..where((tbl) => tbl.id.equals(id)))
         .go();
 
@@ -106,7 +106,7 @@ class NoteBatchesStateNotifier extends StateNotifier<List<NoteBatch>> {
     _remove(oldIndex);
     _insert(newIndex, batch);
     for (int i = 0; i < state.length; i++) {
-      await (_database.update(_database.noteBatches)
+      await (database.update(database.noteBatches)
             ..where((tbl) => tbl.id.equals(state[i].id)))
           .write(
         NoteBatchesCompanion(

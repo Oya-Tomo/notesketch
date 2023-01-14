@@ -112,8 +112,16 @@ class NoteBooksPage extends StatelessWidget {
                       Center(
                         child: IconButton(
                           icon: const Icon(Icons.save),
-                          onPressed: () {
-                            ref.read(notePagesProvider.notifier).saveNotePage(
+                          onPressed: () async {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Saved"),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                            await ref
+                                .read(notePagesProvider.notifier)
+                                .saveNotePage(
                                   openingNotePage.id,
                                   ref
                                       .watch(
@@ -121,12 +129,11 @@ class NoteBooksPage extends StatelessWidget {
                                       .textEditingController
                                       .text,
                                 );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Saved"),
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
+                            await ref
+                                .read(noteBooksProvider.notifier)
+                                .noteBookContentDidUpdate(
+                                  noteBooksPageState.openingNoteBookId!,
+                                );
                           },
                         ),
                       ),
@@ -636,6 +643,7 @@ class NoteBooksPage extends StatelessWidget {
       builder: (context) {
         final nameTextController = TextEditingController();
         return Consumer(builder: (context, ref, child) {
+          final noteBooksPageState = ref.watch(noteBooksPageStateProvider);
           return AlertDialog(
             title: const Text("Create notepage"),
             content: Column(
@@ -668,6 +676,12 @@ class NoteBooksPage extends StatelessWidget {
                     await ref
                         .read(notePagesProvider.notifier)
                         .createNotePage(noteBookId, nameTextController.text);
+
+                    ref
+                        .read(noteBooksProvider.notifier)
+                        .noteBookContentDidUpdate(
+                          noteBooksPageState.openingNoteBookId!,
+                        );
                   }
                 },
               ),
@@ -684,6 +698,7 @@ class NoteBooksPage extends StatelessWidget {
       builder: (context) {
         final nameTextController = TextEditingController();
         return Consumer(builder: (context, ref, child) {
+          final noteBooksPageState = ref.watch(noteBooksPageStateProvider);
           return AlertDialog(
             title: const Text("Rename notepage"),
             content: Column(
@@ -716,6 +731,12 @@ class NoteBooksPage extends StatelessWidget {
                     ref
                         .read(notePagesProvider.notifier)
                         .renameNotePage(id, nameTextController.text);
+
+                    ref
+                        .read(noteBooksProvider.notifier)
+                        .noteBookContentDidUpdate(
+                          noteBooksPageState.openingNoteBookId!,
+                        );
                   }
                 },
               ),
@@ -753,6 +774,9 @@ class NoteBooksPage extends StatelessWidget {
                         .closeNotePage();
                   }
                   ref.read(notePagesProvider.notifier).deleteNotePage(id);
+                  ref.read(noteBooksProvider.notifier).noteBookContentDidUpdate(
+                        noteBooksPageState.openingNoteBookId!,
+                      );
                 },
               ),
             ],

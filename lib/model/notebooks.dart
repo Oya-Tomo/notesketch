@@ -49,10 +49,10 @@ class NoteBook {
 
 class NoteBooksStateNotifier extends StateNotifier<List<NoteBook>> {
   NoteBooksStateNotifier() : super([]);
-  final DataBase _database = DataBase();
+  // final DataBase database = DataBase();
 
   void fetchAllData() async {
-    final rows = await _database.select(_database.noteBooks).get();
+    final rows = await database.select(database.noteBooks).get();
     rows.sort((a, b) => a.index.compareTo(b.index));
     state = rows.map((row) => NoteBook.fromRow(row: row)).toList();
   }
@@ -68,7 +68,7 @@ class NoteBooksStateNotifier extends StateNotifier<List<NoteBook>> {
 
   Future<void> createNoteBook(String title) async {
     final currentTime = DateTime.now();
-    final noteBookId = await _database.into(_database.noteBooks).insert(
+    final noteBookId = await database.into(database.noteBooks).insert(
           NoteBooksCompanion.insert(
             index: state.length,
             title: title,
@@ -88,7 +88,7 @@ class NoteBooksStateNotifier extends StateNotifier<List<NoteBook>> {
 
   // Required : Target notebook has no pages.
   Future<void> deleteNoteBook(int id) async {
-    await (_database.delete(_database.noteBooks)
+    await (database.delete(database.noteBooks)
           ..where((tbl) => tbl.id.equals(id)))
         .go();
     state = state.where((noteBook) => noteBook.id != id).toList();
@@ -96,7 +96,7 @@ class NoteBooksStateNotifier extends StateNotifier<List<NoteBook>> {
 
   Future<void> renameNoteBook(int id, String title) async {
     final currentTime = DateTime.now();
-    await (_database.update(_database.noteBooks)
+    await (database.update(database.noteBooks)
           ..where((tbl) => tbl.id.equals(id)))
         .write(
       NoteBooksCompanion(
@@ -124,7 +124,7 @@ class NoteBooksStateNotifier extends StateNotifier<List<NoteBook>> {
     _remove(oldIndex);
     _insert(newIndex, book);
     for (int i = 0; i < state.length; i++) {
-      await (_database.update(_database.noteBooks)
+      await (database.update(database.noteBooks)
             ..where((tbl) => tbl.id.equals(state[i].id)))
           .write(
         NoteBooksCompanion(
@@ -132,6 +132,26 @@ class NoteBooksStateNotifier extends StateNotifier<List<NoteBook>> {
         ),
       );
     }
+  }
+
+  Future<void> noteBookContentDidUpdate(int id) async {
+    final currentTime = DateTime.now();
+    await (database.update(database.noteBooks)
+          ..where((tbl) => tbl.id.equals(id)))
+        .write(
+      NoteBooksCompanion(
+        updatedAt: Value(currentTime),
+      ),
+    );
+    state = [
+      for (final book in state)
+        if (book.id == id)
+          book.copyWith(
+            updatedAt: currentTime,
+          )
+        else
+          book,
+    ];
   }
 
   void _add(NoteBook noteBook) {

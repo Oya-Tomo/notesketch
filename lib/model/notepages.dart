@@ -54,7 +54,7 @@ class NotePage {
 
 class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
   NotePagesStateNotifier() : super([]);
-  final DataBase _database = DataBase();
+  // final DataBase database = DataBase();
 
   NotePage? getNotePage(int id) {
     for (final page in state) {
@@ -66,11 +66,11 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
   }
 
   void openNoteBook(int id) async {
-    final rowPages = await (_database.select(_database.notePages)
+    final rowPages = await (database.select(database.notePages)
           ..where((t) => t.noteBookId.equals(id)))
         .get();
-    final rowBatches = await (_database.select(_database.noteBatches)).get();
-    final rowEntries = await (_database.select(_database.notePageBatchEntries)
+    final rowBatches = await (database.select(database.noteBatches)).get();
+    final rowEntries = await (database.select(database.notePageBatchEntries)
           ..where(
             (t) => t.notePageId.isIn(
               rowPages.map((row) => row.id).toList(),
@@ -99,7 +99,7 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
 
   Future<void> createNotePage(int noteBookId, String title) async {
     final currentTime = DateTime.now();
-    final notePageId = await _database.into(_database.notePages).insert(
+    final notePageId = await database.into(database.notePages).insert(
           NotePagesCompanion.insert(
             index: state.length,
             noteBookId: noteBookId,
@@ -122,15 +122,15 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
   }
 
   Future<void> deleteNoteBookPages(int noteBookId, bool clearState) async {
-    final pageIds = (await (_database.select(_database.notePages)
+    final pageIds = (await (database.select(database.notePages)
               ..where((tbl) => tbl.noteBookId.equals(noteBookId)))
             .get())
         .map((page) => page.id)
         .toList();
-    await (_database.delete(_database.notePageBatchEntries)
+    await (database.delete(database.notePageBatchEntries)
           ..where((tbl) => tbl.notePageId.isIn(pageIds)))
         .go();
-    await (_database.delete(_database.notePages)
+    await (database.delete(database.notePages)
           ..where((tbl) => tbl.noteBookId.equals(noteBookId)))
         .go();
     if (clearState) {
@@ -139,10 +139,10 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
   }
 
   Future<void> deleteNotePage(int id) async {
-    await (_database.delete(_database.notePageBatchEntries)
+    await (database.delete(database.notePageBatchEntries)
           ..where((tbl) => tbl.notePageId.equals(id)))
         .go();
-    await (_database.delete(_database.notePages)
+    await (database.delete(database.notePages)
           ..where((tbl) => tbl.id.equals(id)))
         .go();
     state = state.where((notePage) => notePage.id != id).toList();
@@ -150,7 +150,7 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
 
   Future<void> saveNotePage(int id, String content) async {
     final currentTime = DateTime.now();
-    await (_database.update(_database.notePages)
+    await (database.update(database.notePages)
           ..where((tbl) => tbl.id.equals(id)))
         .write(
       NotePagesCompanion(
@@ -172,7 +172,7 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
 
   Future<void> renameNotePage(int id, String title) async {
     final currentTime = DateTime.now();
-    await (_database.update(_database.notePages)
+    await (database.update(database.notePages)
           ..where((tbl) => tbl.id.equals(id)))
         .write(
       NotePagesCompanion(
@@ -200,7 +200,7 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
     _remove(oldIndex);
     _insert(newIndex, page);
     for (int i = 0; i < state.length; i++) {
-      await (_database.update(_database.notePages)
+      await (database.update(database.notePages)
             ..where((tbl) => tbl.id.equals(state[i].id)))
           .write(
         NotePagesCompanion(
@@ -211,7 +211,7 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
   }
 
   Future<void> addNotePageBatch(int id, int batchId) async {
-    await (_database.into(_database.notePageBatchEntries).insert(
+    await (database.into(database.notePageBatchEntries).insert(
           NotePageBatchEntriesCompanion.insert(
             notePageId: id,
             noteBatchId: batchId,
@@ -229,7 +229,7 @@ class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
   }
 
   Future<void> deleteNotePageBatch(int id, int batchId) async {
-    await (_database.delete(_database.notePageBatchEntries)
+    await (database.delete(database.notePageBatchEntries)
           ..where((tbl) =>
               tbl.notePageId.equals(id) & tbl.noteBatchId.equals(batchId)))
         .go();
