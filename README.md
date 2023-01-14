@@ -15,9 +15,7 @@
 
 # view images
 
-<img src="./assets/readme/booklist.png" alt="app view image" style="margin: 20px 10px"/>
-<img src="./assets/readme/pagelist.png" alt="app view image" style="margin: 20px 10px"/>
-<img src="./assets/readme/editview.png" alt="app view image" style="margin: 20px 10px"/>
+<img src="./assets/readme/booklist.png" alt="app view image" style="margin: 20px 10px"/> <img src="./assets/readme/pagelist.png" alt="app view image" style="margin: 20px 10px"/> <img src="./assets/readme/editview.png" alt="app view image" style="margin: 20px 10px"/>
 
 # usage
 
