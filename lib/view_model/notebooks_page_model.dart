@@ -19,6 +19,7 @@ class NoteBooksPageStateNotifier extends StateNotifier<NoteBooksPageState> {
           const NoteBooksPageState(drawerPageIndex: 0),
         );
 
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController textEditingController = TextEditingController();
   PageController pageController = PageController();
 

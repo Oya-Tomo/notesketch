@@ -54,7 +54,6 @@ class NotePage {
 
 class NotePagesStateNotifier extends StateNotifier<List<NotePage>> {
   NotePagesStateNotifier() : super([]);
-  // final DataBase database = DataBase();
 
   NotePage? getNotePage(int id) {
     for (final page in state) {

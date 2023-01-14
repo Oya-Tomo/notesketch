@@ -38,7 +38,7 @@ class NoteBatch {
 
 class NoteBatchesStateNotifier extends StateNotifier<List<NoteBatch>> {
   NoteBatchesStateNotifier() : super([]);
-  // final DataBase database = DataBase();
+
   void fetchData() async {
     final rows = (await database.select(database.noteBatches).get())
       ..sort((a, b) => a.index.compareTo(b.index));

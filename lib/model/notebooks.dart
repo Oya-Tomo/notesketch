@@ -49,7 +49,6 @@ class NoteBook {
 
 class NoteBooksStateNotifier extends StateNotifier<List<NoteBook>> {
   NoteBooksStateNotifier() : super([]);
-  // final DataBase database = DataBase();
 
   void fetchAllData() async {
     final rows = await database.select(database.noteBooks).get();

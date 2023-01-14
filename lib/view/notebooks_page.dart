@@ -17,14 +17,15 @@ class NoteBooksPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Notesketch"),
-      ),
-      drawer: Consumer(builder: (context, ref, child) {
-        final noteBooksPageState =
-            ref.watch(noteBooksPageStateProvider.notifier)..restoreDrawer();
-        return Drawer(
+    return Consumer(builder: (context, ref, child) {
+      final noteBooksPageState = ref.watch(noteBooksPageStateProvider.notifier)
+        ..restoreDrawer();
+      return Scaffold(
+        key: noteBooksPageState.scaffoldKey,
+        appBar: AppBar(
+          title: const Text("Notesketch"),
+        ),
+        drawer: Drawer(
           child: PageView(
             key: GlobalKey(),
             controller: noteBooksPageState.pageController,
@@ -39,10 +40,10 @@ class NoteBooksPage extends StatelessWidget {
                   .setDrawerPageIndex(value);
             },
           ),
-        );
-      }),
-      body: pageEditBody(),
-    );
+        ),
+        body: pageEditBody(),
+      );
+    });
   }
 
   Consumer pageEditBody() {
@@ -154,13 +155,29 @@ class NoteBooksPage extends StatelessWidget {
             ],
           );
         } else {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Center(
-                child: Text("Please open any page."),
-              ),
-            ],
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    ref
+                        .read(noteBooksPageStateProvider.notifier)
+                        .scaffoldKey
+                        .currentState!
+                        .openDrawer();
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.navigate_before),
+                      Text("Open drawer"),
+                    ],
+                  ),
+                ),
+                const Text("Please open any page."),
+              ],
+            ),
           );
         }
       },
