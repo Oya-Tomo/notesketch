@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:notesketch/view/color_themes.dart';
+import 'package:notesketch/res/color_themes.dart';
 import 'package:notesketch/view/notebooks_page.dart';
 
 void main() {

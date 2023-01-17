@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notesketch/extension/markdown/editing_controller.dart';
 
 @immutable
 class NoteBooksPageState {
@@ -20,7 +21,8 @@ class NoteBooksPageStateNotifier extends StateNotifier<NoteBooksPageState> {
         );
 
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  TextEditingController textEditingController = TextEditingController();
+  TextEditingController textEditingController =
+      MdHighLightTextEditingController();
   PageController pageController = PageController();
 
   void openNoteBook(int noteBookId) {

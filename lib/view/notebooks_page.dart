@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notesketch/model/notebatches.dart';
 import 'package:notesketch/model/notebooks.dart';
 import 'package:notesketch/model/notepages.dart';
-import 'package:notesketch/view/color_themes.dart';
+import 'package:notesketch/res/color_themes.dart';
 import 'package:notesketch/view/components/batch.dart';
 import 'package:notesketch/view/components/batch_selector.dart';
 import 'package:notesketch/view/components/gradient_button.dart';
@@ -18,29 +18,31 @@ class NoteBooksPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, child) {
-      final noteBooksPageState = ref.watch(noteBooksPageStateProvider.notifier)
-        ..restoreDrawer();
       return Scaffold(
-        key: noteBooksPageState.scaffoldKey,
+        key: ref.watch(noteBooksPageStateProvider.notifier).scaffoldKey,
         appBar: AppBar(
           title: const Text("Notesketch"),
         ),
-        drawer: Drawer(
-          child: PageView(
-            key: GlobalKey(),
-            controller: noteBooksPageState.pageController,
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              noteBookList(),
-              notePageList(),
-            ],
-            onPageChanged: (value) {
-              ref
-                  .read(noteBooksPageStateProvider.notifier)
-                  .setDrawerPageIndex(value);
-            },
-          ),
-        ),
+        drawer: Consumer(builder: (context, ref, child) {
+          final noteBooksPageState =
+              ref.watch(noteBooksPageStateProvider.notifier)..restoreDrawer();
+          return Drawer(
+            child: PageView(
+              key: GlobalKey(),
+              controller: noteBooksPageState.pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                noteBookList(),
+                notePageList(),
+              ],
+              onPageChanged: (value) {
+                ref
+                    .read(noteBooksPageStateProvider.notifier)
+                    .setDrawerPageIndex(value);
+              },
+            ),
+          );
+        }),
         body: pageEditBody(),
       );
     });
@@ -150,6 +152,13 @@ class NoteBooksPage extends StatelessWidget {
                   maxLines: null,
                   expands: true,
                   autofocus: false,
+                  style: const TextStyle(
+                    fontSize: 24,
+                  ),
+                  strutStyle: const StrutStyle(
+                    height: 24,
+                  ),
+                  cursorHeight: 24,
                 ),
               ),
             ],
