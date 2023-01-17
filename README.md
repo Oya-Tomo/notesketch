@@ -26,3 +26,10 @@ You can manage pages by grouping them into books.
 ## notepage list
 
 You can manage your pages by creating batches and attaching them to your pages.
+
+## original markdown syntax
+
+- headers : "#"
+- list item : "-"
+- quote : ">"
+- info : ":::info"
